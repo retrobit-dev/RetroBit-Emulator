@@ -120,7 +120,7 @@ fun LibraryScreen(nav: androidx.navigation.NavController, vm: LibraryViewModel) 
 
 @Composable
 fun RomCard(rom: Rom, onOpen: () -> Unit, onDelete: () -> Unit) {
-    Card(Modifier.fillMaxWidth(), onClick = onOpen) {
+    Card(onClick = onOpen, modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(rom.name, fontWeight = FontWeight.SemiBold)
