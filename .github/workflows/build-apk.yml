@@ -38,6 +38,10 @@ jobs:
           gradle :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
           echo "=== APK FILES ==="
           find . -name "*.apk" -type f
+          APK=$(find . -name "*.apk" -type f | head -1)
+          echo "APK=$APK"
+          cp "$APK" retrobit-emulator.apk
+          ls -la retrobit-emulator.apk
           echo "=== TAIL ==="
           tail -30 build.log
 
@@ -53,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: retrobit-emulator-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: retrobit-emulator.apk
 
       - name: Create GitHub Release with APK
         if: success()
@@ -61,5 +65,5 @@ jobs:
         with:
           tag_name: v0.1.0-debug
           name: RetroBit Emulator (debug APK)
-          files: app/build/outputs/apk/debug/*.apk
+          files: retrobit-emulator.apk
           prerelease: true
