@@ -18,10 +18,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Install Android NDK & CMake
+      - name: Use preinstalled Android SDK/NDK
         run: |
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager "ndk;26.1.10909125" "cmake;3.22.1"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/ndk" 2>/dev/null || true
+          which cmake || true
 
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v3
