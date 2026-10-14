@@ -45,6 +45,36 @@ jobs:
           echo "=== TAIL ==="
           tail -30 build.log
 
+      - name: Publish failure log to gist
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAIL=$(tail -120 build.log)
+          python3 - "$TAIL" <<'PYEOF'
+import json, os, sys
+content = sys.argv[1]
+payload = {
+  "description": "RetroBit build failure log",
+  "public": False,
+  "files": {"build.log": {"content": content}}
+}
+import urllib.request
+req = urllib.request.Request(
+    "https://api.github.com/gists",
+    data=json.dumps(payload).encode(),
+    headers={"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Accept": "application/vnd.github+json"},
+)
+try:
+    with urllib.request.urlopen(req) as r:
+        import json as j
+        d = j.load(r)
+        print("GIST_URL=" + d["html_url"])
+        print("GIST_ID=" + d["id"])
+except Exception as e:
+    print("GIST_ERROR=" + str(e))
+PYEOF
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
