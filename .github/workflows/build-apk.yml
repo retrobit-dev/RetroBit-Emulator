@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,8 +36,10 @@ jobs:
       - name: Build debug APK
         run: |
           gradle :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+          echo "=== APK FILES ==="
+          find . -name "*.apk" -type f
           echo "=== TAIL ==="
-          tail -60 build.log
+          tail -30 build.log
 
       - name: Upload build log
         if: always()
@@ -44,10 +48,18 @@ jobs:
           name: build-log
           path: build.log
 
-      - name: Upload APK
+      - name: Upload APK artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: retrobit-emulator-debug-apk
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
+
+      - name: Create GitHub Release with APK
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0-debug
+          name: RetroBit Emulator (debug APK)
+          files: app/build/outputs/apk/debug/*.apk
+          prerelease: true
