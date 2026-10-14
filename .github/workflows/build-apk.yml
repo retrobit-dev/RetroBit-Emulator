@@ -51,7 +51,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tail -120 build.log > /tmp/tail.log
+          grep -n -A4 "^e:" build.log > /tmp/tail.log || tail -80 build.log > /tmp/tail.log
           gh issue create --title "Build failure log" --body-file /tmp/tail.log || true
 
       - name: Upload build log
